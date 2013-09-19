@@ -89,12 +89,17 @@ float sqrtf_approx(float r) {
     // manipulations boil down to finding approximate log2, dividing by two, and
     // then inverting the log2. A bias is added to make the relative error
     // symmetric about the real answer.
-    const int32_t modifier = 0x1FBB4000;
 
-    int32_t r_i = *(int32_t*)(&r);
-    r_i = (r_i >> 1) + modifier;
+// Avoid strictaliasing
+     const int32_t modifier = 0x1FBB4000;
+     union temp{
+        float r_f;
+        int32_t r_i;
+	}q;
 
-    return *(float*)(&r_i);
+     q.r_f=r;
+     q.r_i=(q.r_i >> 1) + modifier;
+     return q.r_f;
 }
 
 
